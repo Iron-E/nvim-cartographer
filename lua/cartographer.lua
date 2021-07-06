@@ -1,6 +1,25 @@
 --- The Neovim API
 local api = vim.api
 
+--- @param self table this table, which contains the current mode.
+--- @return string mode the current mode being mapped too.
+local function get_mode(cartographer)
+	local primary_mode = rawget(cartographer, 'c') and 'c'
+		or rawget(cartographer, 'i') and 'i'
+		or rawget(cartographer, 'ic') and 'ic'
+		or rawget(cartographer, 'l') and 'l'
+		or rawget(cartographer, 'n') and 'n'
+		or rawget(cartographer, 'nvo') and 'nvo'
+		or rawget(cartographer, 'o') and 'o'
+		or rawget(cartographer, 's') and 's'
+		or rawget(cartographer, 't') and 't'
+		or rawget(cartographer, 'v') and 'v'
+		or rawget(cartographer, 'x') and 'x'
+		or ''
+
+	return rawget(cartographer, '!') and primary_mode..'!' or primary_mode
+end
+
 --- The tool for building `:map`s. Used as a metatable.
 local MetaCartographer =
 {
@@ -21,7 +40,7 @@ local MetaCartographer =
 	--- @param rhs string if `nil`, |:unmap| lhs. Otherwise, see |:map|.
 	__newindex = function(self, lhs, rhs)
 		local buffer = rawget(self, 'buffer')
-		local mode = self:mode()
+		local mode = get_mode(self)
 
 		if rhs then
 			local opts =
@@ -51,30 +70,5 @@ local MetaCartographer =
 
 --- A Neovim plugin to create more straightforward syntax for Lua `:map`ping and `:unmap`ping.
 --- @module nvim-cartographer
---- @alias Cartographer function
---- @return table Cartographer a builder for `:map` / `:unmap` interation
-return function()
-	return setmetatable(
-		{
-			--- @param self table this table, which contains the current mode.
-			--- @return string mode the current mode being mapped too.
-			mode = function(self)
-				local primary_mode = rawget(self, 'c') and 'c'
-					or rawget(self, 'i') and 'i'
-					or rawget(self, 'ic') and 'ic'
-					or rawget(self, 'l') and 'l'
-					or rawget(self, 'n') and 'n'
-					or rawget(self, 'nvo') and 'nvo'
-					or rawget(self, 'o') and 'o'
-					or rawget(self, 's') and 's'
-					or rawget(self, 't') and 't'
-					or rawget(self, 'v') and 'v'
-					or rawget(self, 'x') and 'x'
-					or ''
-
-				return rawget(self, '!') and primary_mode..'!' or primary_mode
-			end,
-		},
-		MetaCartographer
-	)
-end
+--- @return table Cartographer a builder for `:map` / `:unmap` interaction
+return function() return setmetatable({}, MetaCartographer) end
