@@ -12,13 +12,12 @@
 1. About                                                      *cartographer-about*
 
 This is a plugin for Neovim which aims to simplify setting and deleting with
-keybindings / mappings in Lua The target audience is users who are trying to
-port from an `init.vim` to an `init.lua` following the release of Neovim 0.5.
+keybindings / |:map|pings in Lua The target audience is users who are trying to
+port from an |init.vim| to an |init.lua| following the release of Neovim 0.5.
 
 Here is an example: >
 	-- This is how you map with the Neovim API
-	vim.api.nvim_set_keymap(
-		'n', 'gr', '<Cmd>lua vim.lsp.buf.references()<CR>',
+	vim.api.nvim_set_keymap('n', 'gr', '<Cmd>lua vim.lsp.buf.references()<CR>',
 		{noremap=true, silent=true}
 	)
 
@@ -35,7 +34,7 @@ use this plugin in: >
 <
 
 This plugin implements a builder to make toggling options as easy as possible.
-You may specify zero to one of `nvim_set_keymap`'s `mode` argument (i.e. you
+You may specify zero to one of |nvim_set_keymap|'s {mode} argument (i.e. you
 can `map().x` or `map()`).
 
 A `cartographer` operation can be configured further. It supports all of the
@@ -52,10 +51,21 @@ The above is equivalent to the following VimL: >
 --------------------------------------------------------------------------------
 DELETE                                                       *cartographer-delete*
 
-You can unset a `:map`ping as well. To do this, set a `<lhs>` to `nil` instead
-of any `<rhs>`: >
+You can unset a |:map|ping as well. To do this, set a {lhs} to `nil` instead
+of any {rhs}: >
 	-- `:unmap` 'zfo' in `x` mode
 	map().x['zfo'] = nil
+<
+
+--------------------------------------------------------------------------------
+MULTIPLE MODES                                       *cartographer-multiple-modes*
+
+You can |:map| to multiple {mode}s if necessary. All you must do is use a `for`
+loop: >
+	-- Map `gr` to LSP symbol references in 'x' and 'n' modes.
+	for _, mode in ipairs({'n', 'x'}) do
+		map()[mode].nore.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
+	end
 <
 
 ================================================================================
