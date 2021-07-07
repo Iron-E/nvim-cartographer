@@ -72,5 +72,5 @@ return setmetatable({},
 {
 	-- NOTE: For backwards compatability. `__index` is preferred.
 	__call = function(_) return setmetatable({}, MetaCartographer) end,
-	__index = function(_, _) return setmetatable({}, MetaCartographer) end,
+	__index = function(_, key) return setmetatable({}, MetaCartographer)[key] end,
 })
