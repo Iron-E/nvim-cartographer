@@ -9,7 +9,7 @@ Here is an example:
 vim.api.nvim_set_keymap('n', 'gr', '<Cmd>lua vim.lsp.buf.references()<CR>', {noremap=true, silent=true})
 
 -- This is how you do that with `nvim-cartographer`
-map().n.nore.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
+map.n.nore.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
 ```
 
 ## Installation
@@ -41,13 +41,13 @@ To import this plugin, add the following line to the top of any file you wish to
 local map = require 'cartographer'
 ```
 
-This plugin implements a builder to make toggling options as easy as possible. You may specify zero to one of `nvim_set_keymap`'s `mode` argument (i.e. you can `map().x` or `map()`).
+This plugin implements a builder to make toggling options as easy as possible. You may specify zero to one of `nvim_set_keymap`'s `mode` argument (i.e. you can `map.x` or `map`).
 
 A `cartographer` operation can be configured further. It supports all of the `:map-arguments`. `nore` is used to perform a non-recursive `:map`:
 
 ```lua
 -- `:map` 'gt' in normal mode to searching for symbol references with the LSP
-map().n.nore.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
+map.n.nore.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
 ```
 
 The above is equivalent to the following VimL:
@@ -63,7 +63,7 @@ You can unset a `:map`ping as well. To do this, set a `<lhs>` to `nil` instead o
 
 ```lua
 -- `:unmap` 'zfo' in `x` mode
-map().x['zfo'] = nil
+map.x['zfo'] = nil
 ```
 
 ### Multiple Modes
@@ -73,6 +73,6 @@ You can `:map` to multiple `modes` if necessary. All you must do is use a `for` 
 ```lua
 -- Map `gr` to LSP symbol references in 'x' and 'n' modes.
 for _, mode in ipairs({'n', 'x'}) do
-	map()[mode].nore.expr['<Tab>'] = 'pumvisible() ? "\\<C-n>" : check_backspace() ? "\\<Tab>" : compe#complete()'
+	map[mode].nore.expr['<Tab>'] = 'pumvisible() ? "\\<C-n>" : check_backspace() ? "\\<Tab>" : compe#complete()'
 end
 ```

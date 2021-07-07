@@ -22,7 +22,7 @@ Here is an example: >
 	)
 
 	-- This is how you do that with `nvim-cartographer`
-	map().n.nore.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
+	map.n.nore.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
 <
 
 ================================================================================
@@ -35,12 +35,12 @@ use this plugin in: >
 
 This plugin implements a builder to make toggling options as easy as possible.
 You may specify zero to one of |nvim_set_keymap|'s {mode} argument (i.e. you
-can `map().x` or `map()`).
+can `map.x` or `map`).
 
 A `cartographer` operation can be configured further. It supports all of the
 `:map-arguments`, and `nore` is used to perform a non-recursive `:map`: >
 	-- `:map` 'gr' in normal mode to searching for references with the LSP
-	map().n.nore.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
+	map.n.nore.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
 <
 
 The above is equivalent to the following VimL: >
@@ -54,7 +54,7 @@ DELETE                                                       *cartographer-delet
 You can unset a |:map|ping as well. To do this, set a {lhs} to `nil` instead
 of any {rhs}: >
 	-- `:unmap` 'zfo' in `x` mode
-	map().x['zfo'] = nil
+	map.x['zfo'] = nil
 <
 
 --------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ You can |:map| to multiple {mode}s if necessary. All you must do is use a `for`
 loop: >
 	-- Map `gr` to LSP symbol references in 'x' and 'n' modes.
 	for _, mode in ipairs({'n', 'x'}) do
-		map()[mode].nore.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
+		map[mode].nore.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
 	end
 <
 
