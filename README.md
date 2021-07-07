@@ -65,3 +65,14 @@ You can unset a `:map`ping as well. To do this, set a `<lhs>` to `nil` instead o
 -- `:unmap` 'zfo' in `x` mode
 map().x['zfo'] = nil
 ```
+
+### Multiple Modes
+
+You can `:map` to multiple `modes` if necessary. All you must do is use a `for` loop:
+
+```lua
+-- Map `gr` to LSP symbol references in 'x' and 'n' modes.
+for _, mode in ipairs({'n', 'x'}) do
+	map()[mode].nore.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
+end
+```
