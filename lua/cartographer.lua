@@ -2,22 +2,6 @@
 local api = vim.api
 local Callbacks = require 'cartographer.callbacks'
 
---- @param cartographer table this table, which contains the current mode.
---- @return string mode the current mode being mapped too.
-local function get_mode(cartographer)
-	return rawget(cartographer, 'c') and 'c'
-		or rawget(cartographer, '!') and '!'
-		or rawget(cartographer, 'i') and 'i'
-		or rawget(cartographer, 'l') and 'l'
-		or rawget(cartographer, 'n') and 'n'
-		or rawget(cartographer, 'o') and 'o'
-		or rawget(cartographer, 's') and 's'
-		or rawget(cartographer, 't') and 't'
-		or rawget(cartographer, 'v') and 'v'
-		or rawget(cartographer, 'x') and 'x'
-		or ''
-end
-
 --- The tool for building `:map`s. Used as a metatable.
 local MetaCartographer =
 {
@@ -26,9 +10,12 @@ local MetaCartographer =
 	--- @param key string the setting to set to `true`
 	--- @returns table self so that this function can be called again
 	__index = function(self, key)
-		if not rawget(self, key) then -- the builder
+		if #key == 1 then -- set the mode
+			rawset(self, '__mode', key)
+		else -- the builder
 			rawset(self, key, true)
 		end
+
 		return self
 	end,
 
@@ -38,7 +25,7 @@ local MetaCartographer =
 	--- @param rhs string if `nil`, |:unmap| lhs. Otherwise, see |:map|.
 	__newindex = function(self, lhs, rhs)
 		local buffer = rawget(self, 'buffer')
-		local mode = get_mode(self)
+		local mode = rawget(self, '__mode') or ''
 
 		if rhs then
 			local opts =
