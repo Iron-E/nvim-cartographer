@@ -1,5 +1,6 @@
 --- The Neovim API
 local api = vim.api
+local Callbacks = require 'cartographer.callbacks'
 
 --- @param cartographer table this table, which contains the current mode.
 --- @return string mode the current mode being mapped too.
@@ -49,6 +50,12 @@ local MetaCartographer =
 				silent = rawget(self, 'silent'),
 				unique = rawget(self, 'unique'),
 			}
+
+			if type(rhs) == 'function' then
+				local id = Callbacks.new(rhs)
+				rhs = '<Cmd>lua require("cartographer.callbacks")['..id..']()<CR>'
+				opts.noremap = true
+			end
 
 			if buffer then
 				return api.nvim_buf_set_keymap(0, mode, lhs, rhs, opts)
