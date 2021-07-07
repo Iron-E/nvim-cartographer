@@ -57,13 +57,35 @@ The above is equivalent to the following VimL:
 nnoremap <silent> gr <Cmd>lua vim.lsp.buf.references()<CR>
 ```
 
-### Delete
-
-You can unset a `:map`ping as well. To do this, set a `<lhs>` to `nil` instead of any `<rhs>`:
+You can `:unmap` as well by setting a `<lhs>` to `nil` instead of any `<rhs>`:
 
 ```lua
 -- `:unmap` 'zfo' in `x` mode
 map.x['zfo'] = nil
+```
+
+### Lua Functions
+
+You can also register `local` lua `function`s to mappings, rather than attempt to navigate `v:lua`/`luaeval` bindings:
+
+```lua
+local api = vim.api
+local go = vim.go
+
+local function float_term()
+	local buffer = api.nvim_create_buf(false, true)
+	local window = api.nvim_open_win(buffer, true,
+	{
+		relative = 'cursor',
+		height = math.floor(go.lines / 2),
+		width = math.floor(go.columns / 2),
+		col = 0,
+		row = 0,
+	})
+	api.nvim_command 'terminal'
+end
+
+map.n.nore.silent['<Tab>'] = float_term
 ```
 
 ### Multiple Modes
