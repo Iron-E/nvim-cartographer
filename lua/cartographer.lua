@@ -1,6 +1,25 @@
 --- The Neovim API
 local api = vim.api
 
+-- See if this script is executing firsttime
+local ok, callbacks = pcall(require, 'cartographer.callbacks')
+if not ok then
+  -- Hack to avoid globals and retain callbacks on multiple execution
+  -- It's first time create callbacks table
+  callbacks = setmetatable({register = {}}, {
+    __index = function(self, k) return rawget(self, k) or self.register[k] end
+  })
+  -- Put it in require cache so we can kust call it through require
+  package.loaded['cartographer.callbacks'] = callbacks
+end
+
+-- Add a new callback
+function callbacks.new(cb)
+  local len = #callbacks.register
+  table.insert(callbacks.register, cb)
+  return len + 1
+end
+
 --- @param cartographer table this table, which contains the current mode.
 --- @return string mode the current mode being mapped too.
 local function get_mode(cartographer)
@@ -49,6 +68,12 @@ local MetaCartographer =
 				silent = rawget(self, 'silent'),
 				unique = rawget(self, 'unique'),
 			}
+
+			if type(rhs) == 'function' then
+				local id = callbacks.new(rhs)
+				rhs = '<cmd>lua require("cartographer.callbacks")['..tostring(id)..']()<cr>'
+				opts.noremap = true
+			end
 
 			if buffer then
 				return api.nvim_buf_set_keymap(0, mode, lhs, rhs, opts)
