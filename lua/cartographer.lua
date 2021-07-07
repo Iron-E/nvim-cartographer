@@ -68,4 +68,9 @@ local MetaCartographer =
 --- A Neovim plugin to create more straightforward syntax for Lua `:map`ping and `:unmap`ping.
 --- @module nvim-cartographer
 --- @return table Cartographer a builder for `:map` / `:unmap` interaction
-return function() return setmetatable({}, MetaCartographer) end
+return setmetatable({},
+{
+	-- NOTE: For backwards compatability. `__index` is preferred.
+	__call = function(_) return setmetatable({}, MetaCartographer) end,
+	__index = function(_, _) return setmetatable({}, MetaCartographer) end,
+})
