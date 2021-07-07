@@ -38,7 +38,6 @@ end}
 To import this plugin, add the following line to the top of any file you wish to use this plugin in:
 
 ```lua
--- or something shorter, like `local c = …`
 local map = require 'cartographer'
 ```
 
