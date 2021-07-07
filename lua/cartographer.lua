@@ -1,23 +1,20 @@
 --- The Neovim API
 local api = vim.api
 
---- @param self table this table, which contains the current mode.
+--- @param cartographer table this table, which contains the current mode.
 --- @return string mode the current mode being mapped too.
 local function get_mode(cartographer)
-	local primary_mode = rawget(cartographer, 'c') and 'c'
+	return rawget(cartographer, 'c') and 'c'
+		or rawget(cartographer, '!') and '!'
 		or rawget(cartographer, 'i') and 'i'
-		or rawget(cartographer, 'ic') and 'ic'
 		or rawget(cartographer, 'l') and 'l'
 		or rawget(cartographer, 'n') and 'n'
-		or rawget(cartographer, 'nvo') and 'nvo'
 		or rawget(cartographer, 'o') and 'o'
 		or rawget(cartographer, 's') and 's'
 		or rawget(cartographer, 't') and 't'
 		or rawget(cartographer, 'v') and 'v'
 		or rawget(cartographer, 'x') and 'x'
 		or ''
-
-	return rawget(cartographer, '!') and primary_mode..'!' or primary_mode
 end
 
 --- The tool for building `:map`s. Used as a metatable.
