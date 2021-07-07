@@ -1,0 +1,62 @@
+*cartographer.txt*           Create mappings with Lua
+*cartographer*
+*nvim-cartographer*
+
+================================================================================
+0. Table of Contents                                                *cartographer-toc*
+
+1. About ................ |cartographer-about|
+2. Usage ................ |cartographer-usage|
+
+================================================================================
+1. About                                                      *cartographer-about*
+
+This is a plugin for Neovim which aims to simplify setting and deleting with
+keybindings / mappings in Lua The target audience is users who are trying to
+port from an `init.vim` to an `init.lua` following the release of Neovim 0.5.
+
+Here is an example: >
+	-- This is how you map with the Neovim API
+	vim.api.nvim_set_keymap(
+		'n', 'gr', '<Cmd>lua vim.lsp.buf.references()<CR>',
+		{noremap=true, silent=true}
+	)
+
+	-- This is how you do that with `nvim-cartographer`
+	map().n.nore.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
+<
+
+================================================================================
+2. Usage                                                      *cartographer-usage*
+
+To import this plugin, add the following line to the top of any file you wish to
+use this plugin in: >
+	local map = require 'cartographer'
+<
+
+This plugin implements a builder to make toggling options as easy as possible.
+You may specify zero to one of `nvim_set_keymap`'s `mode` argument (i.e. you
+can `map().x` or `map()`).
+
+A `cartographer` operation can be configured further. It supports all of the
+`:map-arguments`, and `nore` is used to perform a non-recursive `:map`: >
+	-- `:map` 'gr' in normal mode to searching for references with the LSP
+	map().n.nore.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
+<
+
+The above is equivalent to the following VimL: >
+	" This is how you bind `gr` to the builtin LSP symbol-references command
+	nnoremap <silent> gr <Cmd>lua vim.lsp.buf.references()<CR>
+<
+
+--------------------------------------------------------------------------------
+DELETE                                                       *cartographer-delete*
+
+You can unset a `:map`ping as well. To do this, set a `<lhs>` to `nil` instead
+of any `<rhs>`: >
+	-- `:unmap` 'zfo' in `x` mode
+	map().x['zfo'] = nil
+<
+
+================================================================================
+vim:tw=80:ts=4:ft=help:norl:
