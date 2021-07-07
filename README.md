@@ -73,6 +73,6 @@ You can `:map` to multiple `modes` if necessary. All you must do is use a `for` 
 ```lua
 -- Map `gr` to LSP symbol references in 'x' and 'n' modes.
 for _, mode in ipairs({'n', 'x'}) do
-	map()[mode].nore.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
+	map()[mode].nore.expr['<Tab>'] = 'pumvisible() ? "\\<C-n>" : check_backspace() ? "\\<Tab>" : compe#complete()'
 end
 ```
