@@ -57,6 +57,15 @@ The above is equivalent to the following VimL:
 nnoremap <silent> gr <Cmd>lua vim.lsp.buf.references()<CR>
 ```
 
+You can set buffer local keymaps:
+```lua
+-- Only buffer sets map to current buffer
+map.n.nore.buffer.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
+-- You can specify bufnr like <bufer=n>
+-- This keymap will be set for buffer no 3
+map.n.nore.buffer3.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
+```
+
 If you're going to have multiple mappings with similar options it's easy to do
 ```lua
 local nnoremap = require 'cartographer'.n.nore.silent

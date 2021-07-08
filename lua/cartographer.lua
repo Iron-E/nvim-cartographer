@@ -21,7 +21,12 @@ MetaCartographer =
 		else -- the builder
 			if not opts[key] then -- the builder
 				opts = vim.deepcopy(opts)
-				opts[key] = true
+				if not vim.startswith(key, 'buffer') then
+					opts[key] = true
+				else
+					local bufnr = tonumber(key:sub(7))
+					opts.buffer = bufnr or 0
+				end
 				return setmetatable({opts = opts}, MetaCartographer)
 			end
 		end
@@ -55,7 +60,7 @@ MetaCartographer =
 
 			for mode, _ in pairs(modes) do
 				if buffer then
-					api.nvim_buf_set_keymap(0, mode, lhs, rhs, keymap_opts)
+					api.nvim_buf_set_keymap(buffer, mode, lhs, rhs, keymap_opts)
 			else
 					api.nvim_set_keymap(mode, lhs, rhs, keymap_opts)
 				end
@@ -63,7 +68,7 @@ MetaCartographer =
 		else
 			for mode, _ in pairs(modes) do
 				if buffer then
-					api.nvim_buf_del_keymap(0, mode, lhs)
+					api.nvim_buf_del_keymap(buffer, mode, lhs)
 				else
 				api.nvim_del_keymap(mode, lhs)
 				end
