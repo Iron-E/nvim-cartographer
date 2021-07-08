@@ -10,7 +10,7 @@ local MetaCartographer =
 	--- @param key string the setting to set to `true`
 	--- @returns table self so that this function can be called again
 	__index = function(self, key)
-		if #key == 1 then -- set the mode
+		if #key < 2 then -- set the mode
 			rawset(self, '__mode', key)
 		else -- the builder
 			rawset(self, key, true)
