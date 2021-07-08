@@ -2,6 +2,17 @@
 local api = vim.api
 local Callbacks = require 'cartographer.callbacks'
 
+-- Make a deep copy of opts table
+local function copy_opts(tbl)
+	local new_tbl = {_mode = {}}
+	for key, val in pairs(tbl) do
+		if key ~= '_mode' then new_tbl[key] = val
+		else for k, v in pairs(tbl._mode) do new_tbl._mode[k] = v end
+		end
+	end
+	return new_tbl
+end
+
 --- The tool for building `:map`s. Used as a metatable.
 local MetaCartographer
 MetaCartographer =
@@ -14,16 +25,17 @@ MetaCartographer =
 		local opts = rawget(self, 'opts')
 		if #key < 2 then -- set the mode
 			if not opts._mode[key] then
-				opts = vim.deepcopy(opts)
+				opts = copy_opts(opts)
 				opts._mode[key] = true
 				return setmetatable({opts = opts}, MetaCartographer)
 			end
 		else -- the builder
 			if not opts[key] then -- the builder
-				opts = vim.deepcopy(opts)
-				if not vim.startswith(key, 'buffer') then
+			-- if true then return self end
+				opts = copy_opts(opts)
+				if key:sub(1,6) ~= 'buffer' then
 					opts[key] = true
-				else
+				else -- Handels buffer option
 					local bufnr = tonumber(key:sub(7))
 					opts.buffer = bufnr or 0
 				end
@@ -61,16 +73,16 @@ MetaCartographer =
 			for mode, _ in pairs(modes) do
 				if buffer then
 					api.nvim_buf_set_keymap(buffer, mode, lhs, rhs, keymap_opts)
-			else
+				else
 					api.nvim_set_keymap(mode, lhs, rhs, keymap_opts)
 				end
 			end
-		else
+		else -- Remove keymap
 			for mode, _ in pairs(modes) do
 				if buffer then
 					api.nvim_buf_del_keymap(buffer, mode, lhs)
 				else
-				api.nvim_del_keymap(mode, lhs)
+					api.nvim_del_keymap(mode, lhs)
 				end
 			end
 		end
