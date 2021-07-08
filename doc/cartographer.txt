@@ -91,9 +91,7 @@ MULTIPLE MODES                                       *cartographer-multiple-mode
 You can |:map| to multiple {mode}s if necessary. All you must do is use a `for`
 loop: >
 	-- Map `gr` to LSP symbol references in 'x' and 'n' modes.
-	for _, mode in ipairs({'n', 'x'}) do
-		map[mode].nore.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
-	end
+	map.n.x.nore.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
 <
 
 ================================================================================

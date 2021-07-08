@@ -53,16 +53,20 @@ MetaCartographer =
 				keymap_opts.noremap = true
 			end
 
-			if buffer then
-				return api.nvim_buf_set_keymap(0, mode, lhs, rhs, keymap_opts)
+			for mode, _ in pairs(modes) do
+				if buffer then
+					api.nvim_buf_set_keymap(0, mode, lhs, rhs, keymap_opts)
 			else
-				return api.nvim_set_keymap(mode, lhs, rhs, keymap_opts)
+					api.nvim_set_keymap(mode, lhs, rhs, keymap_opts)
+				end
 			end
 		else
-			if buffer then
-				return api.nvim_buf_del_keymap(0, mode, lhs)
-			else
-				return api.nvim_del_keymap(mode, lhs)
+			for mode, _ in pairs(modes) do
+				if buffer then
+					api.nvim_buf_del_keymap(0, mode, lhs)
+				else
+				api.nvim_del_keymap(mode, lhs)
+				end
 			end
 		end
 	end,
