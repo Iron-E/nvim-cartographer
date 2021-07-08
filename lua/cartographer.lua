@@ -1,15 +1,24 @@
 --- The Neovim API
 local api = vim.api
+
+--- The Cargorapher Lua-callbacks registrant
 local Callbacks = require 'cartographer.callbacks'
 
--- Make a deep copy of opts table
-local function copy_opts(tbl)
-	local new_tbl = {_mode = {}}
+--- Return an empty table with all necessary fields initialized.
+--- @return table
+local function new() return { _modes={} } end
+
+--- Make a deep copy of opts table
+--- @param tbl table the table to copy
+local function copy(tbl)
+	local new_tbl = new()
+
 	for key, val in pairs(tbl) do
-		if key ~= '_mode' then new_tbl[key] = val
-		else for k, v in pairs(tbl._mode) do new_tbl._mode[k] = v end
+		if key ~= '_modes' then new_tbl[key] = val
+		else for i, mode in ipairs(tbl._modes) do new_tbl._modes[i] = mode end
 		end
 	end
+
 	return new_tbl
 end
 
@@ -22,27 +31,15 @@ MetaCartographer =
 	--- @param key string the setting to set to `true`
 	--- @returns table self so that this function can be called again
 	__index = function(self, key)
-		local opts = rawget(self, 'opts')
+		self = copy(self)
+
 		if #key < 2 then -- set the mode
-			if not opts._mode[key] then
-				opts = copy_opts(opts)
-				opts._mode[key] = true
-				return setmetatable({opts = opts}, MetaCartographer)
-			end
+			table.insert(rawget(self, '_modes'), key)
 		else -- the builder
-			if not opts[key] then -- the builder
-			-- if true then return self end
-				opts = copy_opts(opts)
-				if key:sub(1,6) ~= 'buffer' then
-					opts[key] = true
-				else -- Handels buffer option
-					local bufnr = tonumber(key:sub(7))
-					opts.buffer = bufnr or 0
-				end
-				return setmetatable({opts = opts}, MetaCartographer)
-			end
+			rawset(self, key, true)
 		end
-		return self
+
+		return setmetatable(self, MetaCartographer)
 	end,
 
 	--- Set a `lhs` combination of keys to some `rhs`
@@ -50,38 +47,42 @@ MetaCartographer =
 	--- @param lhs string the left-hand side |key-notation| which will execute `rhs` after running this function
 	--- @param rhs string if `nil`, |:unmap| lhs. Otherwise, see |:map|.
 	__newindex = function(self, lhs, rhs)
-		local opts = rawget(self, 'opts')
-		local buffer = opts.buffer
-		local modes = next(opts._mode) and opts._mode or {[''] = true}
+		local buffer = rawget(self, 'buffer')
+		local modes = rawget(self, '_modes') or {''}
 
 		if rhs then
-			local keymap_opts = {
-				expr = opts.expr,
-				noremap = opts.nore,
-				nowait = opts.nowait,
-				script = opts.script,
-				silent = opts.silent,
-				unique = opts.unique,
+			local opts =
+			{
+				expr = rawget(self, 'expr'),
+				noremap = rawget(self, 'nore'),
+				nowait = rawget(self, 'nowait'),
+				script = rawget(self, 'script'),
+				silent = rawget(self, 'silent'),
+				unique = rawget(self, 'unique'),
 			}
 
 			if type(rhs) == 'function' then
 				local id = Callbacks.new(rhs)
 				rhs = '<Cmd>lua require("cartographer.callbacks")['..id..']()<CR>'
-				keymap_opts.noremap = true
+				opts.noremap = true
 			end
 
-			for mode, _ in pairs(modes) do
-				if buffer then
-					api.nvim_buf_set_keymap(buffer, mode, lhs, rhs, keymap_opts)
-				else
-					api.nvim_set_keymap(mode, lhs, rhs, keymap_opts)
+			if buffer then
+				for _, mode in ipairs(modes) do
+					api.nvim_buf_set_keymap(0, mode, lhs, rhs, opts)
+				end
+			else
+				for _, mode in ipairs(modes) do
+					api.nvim_set_keymap(mode, lhs, rhs, opts)
 				end
 			end
-		else -- Remove keymap
-			for mode, _ in pairs(modes) do
-				if buffer then
-					api.nvim_buf_del_keymap(buffer, mode, lhs)
-				else
+		else
+			if buffer then
+				for _, mode in ipairs(modes) do
+					api.nvim_buf_del_keymap(0, mode, lhs)
+				end
+			else
+				for _, mode in ipairs(modes) do
 					api.nvim_del_keymap(mode, lhs)
 				end
 			end
@@ -95,6 +96,6 @@ MetaCartographer =
 return setmetatable({},
 {
 	-- NOTE: For backwards compatability. `__index` is preferred.
-	__call = function(_) return setmetatable({opts={_mode = {}}}, MetaCartographer) end,
-	__index = function(_, key) return setmetatable({opts={_mode = {}}}, MetaCartographer)[key] end,
+	__call = function(_) return setmetatable(new(), MetaCartographer) end,
+	__index = function(_, key) return setmetatable(new(), MetaCartographer)[key] end,
 })
