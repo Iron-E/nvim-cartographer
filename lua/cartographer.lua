@@ -11,7 +11,7 @@ local MetaCartographer =
 	--- @returns table self so that this function can be called again
 	__index = function(self, key)
 		if #key < 2 then -- set the mode
-			rawset(self, '__mode', key)
+			rawset(self, '_mode', key)
 		else -- the builder
 			rawset(self, key, true)
 		end
@@ -25,7 +25,7 @@ local MetaCartographer =
 	--- @param rhs string if `nil`, |:unmap| lhs. Otherwise, see |:map|.
 	__newindex = function(self, lhs, rhs)
 		local buffer = rawget(self, 'buffer')
-		local mode = rawget(self, '__mode') or ''
+		local mode = rawget(self, '_mode') or ''
 
 		if rhs then
 			local opts =
