@@ -34,9 +34,11 @@ MetaCartographer =
 		self = copy(self)
 
 		if #key < 2 then -- set the mode
-			table.insert(rawget(self, '_modes'), key)
+			self._modes[#self._modes+1] = key
+		elseif #key > 5 and key:sub(1, 1) == 'b' then -- PERF: 'buffer' is the only 6-letter option starting with 'b'
+			self.buffer = #key > 6 and tonumber(key:sub(7)) or 0 -- NOTE: 0 is the current buffer
 		else -- the builder
-			rawset(self, key, true)
+			self[key] = true
 		end
 
 		return setmetatable(self, MetaCartographer)
@@ -48,7 +50,8 @@ MetaCartographer =
 	--- @param rhs string if `nil`, |:unmap| lhs. Otherwise, see |:map|.
 	__newindex = function(self, lhs, rhs)
 		local buffer = rawget(self, 'buffer')
-		local modes = rawget(self, '_modes') or {''}
+		local modes = rawget(self, '_modes')
+		modes = #modes > 0 and modes or {''}
 
 		if rhs then
 			local opts =
@@ -69,7 +72,7 @@ MetaCartographer =
 
 			if buffer then
 				for _, mode in ipairs(modes) do
-					api.nvim_buf_set_keymap(0, mode, lhs, rhs, opts)
+					api.nvim_buf_set_keymap(buffer, mode, lhs, rhs, opts)
 				end
 			else
 				for _, mode in ipairs(modes) do
@@ -79,7 +82,7 @@ MetaCartographer =
 		else
 			if buffer then
 				for _, mode in ipairs(modes) do
-					api.nvim_buf_del_keymap(0, mode, lhs)
+					api.nvim_buf_del_keymap(buffer, mode, lhs)
 				end
 			else
 				for _, mode in ipairs(modes) do
