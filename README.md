@@ -69,10 +69,10 @@ map.n.nore.buffer3.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
 If you're going to have multiple mappings with similar options it's easy to do
 ```lua
 local nnoremap = require 'cartographer'.n.nore.silent
-noremap['key1'] = expr1
-noremap['key2'] = expr2
+nnoremap['key1'] = expr1
+nnoremap['key2'] = expr2
 -- You can add options on top of this too
-noremap.buffer['key3'] = expr3
+nnoremap.buffer['key3'] = expr3
 ```
 
 You can `:unmap` as well by setting a `<lhs>` to `nil` instead of any `<rhs>`:
