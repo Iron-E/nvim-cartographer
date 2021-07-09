@@ -47,29 +47,25 @@ The above is equivalent to the following VimL: >
 	" This is how you bind `gr` to the builtin LSP symbol-references command
 	nnoremap <silent> gr <Cmd>lua vim.lsp.buf.references()<CR>
 <
-You can set buffer local keymaps:
->
-  -- Only buffer sets map to current buffer
-  map.n.nore.buffer.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
-  -- You can specify bufnr like <bufer=n>
-  -- This keymap will be set for buffer no 3
-  map.n.nore.buffer3.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
+
+You can create mappings for specific buffers: >
+	-- Only buffer sets map to current buffer
+	map.n.nore.buffer.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
+
+	-- You can specify bufnr like <bufer=n>
+	-- This keymap will be set for buffer 3
+	map.n.nore.buffer3.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
 <
 
+Creating multiple mapings with similar options is easy to do: >
+	local nnoremap = require 'cartographer'.n.nore.silent
+	nnoremap['key1'] = expr1
+	nnoremap['key2'] = expr2
 
-If you're going to have multiple mappings with similar options it's easy to do
->
-  local nnoremap = require 'cartographer'.n.nore.silent
-  nnoremap['key1'] = expr1
-  nnoremap['key2'] = expr2
-  -- You can add options on top of this too
-  nnoremap.buffer['key3'] = expr3
+	-- You can add options on top of `nnoremap` too
+	nnoremap.buffer['key3'] = expr3
 <
 
-You can |:unmap| as well by setting a {lhs} to `nil` instead of any {rhs}: >
-	-- `:unmap` 'zfo' in `x` mode
-	map.x['zfo'] = nil
-<
 --------------------------------------------------------------------------------
 LUA FUNCTIONS                                         *cartographer-lua-functions*
 
@@ -100,6 +96,14 @@ MULTIPLE MODES                                       *cartographer-multiple-mode
 You can |:map| to multiple {mode}s if necessary. >
 	-- Map `gr` to LSP symbol references in 'x' and 'n' modes.
 	map.n.x.nore.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
+<
+
+--------------------------------------------------------------------------------
+UNMAPPING                                                 *cartographer-unmapping*
+
+You can |:unmap| as well by setting a {lhs} to `nil` instead of any {rhs}: >
+	-- `:unmap` 'zfo' in `x` mode
+	map.x['zfo'] = nil
 <
 
 ================================================================================
