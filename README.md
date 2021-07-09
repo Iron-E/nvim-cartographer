@@ -57,6 +57,24 @@ The above is equivalent to the following VimL:
 nnoremap <silent> gr <Cmd>lua vim.lsp.buf.references()<CR>
 ```
 
+You can set buffer local keymaps:
+```lua
+-- Only buffer sets map to current buffer
+map.n.nore.buffer.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
+-- You can specify bufnr like <bufer=n>
+-- This keymap will be set for buffer no 3
+map.n.nore.buffer3.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
+```
+
+If you're going to have multiple mappings with similar options it's easy to do
+```lua
+local nnoremap = require 'cartographer'.n.nore.silent
+nnoremap['key1'] = expr1
+nnoremap['key2'] = expr2
+-- You can add options on top of this too
+nnoremap.buffer['key3'] = expr3
+```
+
 You can `:unmap` as well by setting a `<lhs>` to `nil` instead of any `<rhs>`:
 
 ```lua
@@ -94,7 +112,5 @@ You can `:map` to multiple `modes` if necessary. All you must do is use a `for` 
 
 ```lua
 -- Map `gr` to LSP symbol references in 'x' and 'n' modes.
-for _, mode in ipairs({'n', 'x'}) do
-	map[mode].nore.expr['<Tab>'] = 'pumvisible() ? "\\<C-n>" : check_backspace() ? "\\<Tab>" : compe#complete()'
-end
+map.n.x.nore.expr['<Tab>'] = 'pumvisible() ? "\\<C-n>" : check_backspace() ? "\\<Tab>" : compe#complete()'
 ```
