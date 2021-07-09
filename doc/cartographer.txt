@@ -97,8 +97,7 @@ navigate |v:lua| / |luaeval| bindings: >
 --------------------------------------------------------------------------------
 MULTIPLE MODES                                       *cartographer-multiple-modes*
 
-You can |:map| to multiple {mode}s if necessary. All you must do is use a `for`
-loop: >
+You can |:map| to multiple {mode}s if necessary. >
 	-- Map `gr` to LSP symbol references in 'x' and 'n' modes.
 	map.n.x.nore.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
 <

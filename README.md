@@ -108,7 +108,7 @@ map.n.nore.silent['<Tab>'] = float_term
 
 ### Multiple Modes
 
-You can `:map` to multiple `modes` if necessary. All you must do is use a `for` loop:
+You can `:map` to multiple `modes` if necessary.
 
 ```lua
 -- Map `gr` to LSP symbol references in 'x' and 'n' modes.
