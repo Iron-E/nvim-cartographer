@@ -66,7 +66,9 @@ MetaCartographer =
 
 			if type(rhs) == 'function' then
 				local id = Callbacks.new(rhs)
-				rhs = '<Cmd>lua require("cartographer.callbacks")['..id..']()<CR>'
+				rhs = opts.expr and
+					'luaeval("require(\'cartographer.callbacks\')['..id..']")()' or
+					'<Cmd>lua require("cartographer.callbacks")['..id..']()<CR>'
 				opts.noremap = true
 			end
 
