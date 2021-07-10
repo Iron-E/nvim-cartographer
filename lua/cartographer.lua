@@ -6,7 +6,7 @@ local Callbacks = require 'cartographer.callbacks'
 
 --- Return an empty table with all necessary fields initialized.
 --- @return table
-local function new() return { _modes={} } end
+local function new() return {_modes = {}} end
 
 --- Make a deep copy of opts table
 --- @param tbl table the table to copy
@@ -98,9 +98,10 @@ MetaCartographer =
 --- A Neovim plugin to create more straightforward syntax for Lua `:map`ping and `:unmap`ping.
 --- @module nvim-cartographer
 --- @return table Cartographer a builder for `:map` / `:unmap` interaction
-return setmetatable({},
+return setmetatable(new(),
 {
 	-- NOTE: For backwards compatability. `__index` is preferred.
 	__call = function(_) return setmetatable(new(), MetaCartographer) end,
 	__index = function(_, key) return setmetatable(new(), MetaCartographer)[key] end,
+	__newindex = MetaCartographer.__newindex,
 })
