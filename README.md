@@ -41,42 +41,39 @@ To import this plugin, add the following line to the top of any file you wish to
 local map = require 'cartographer'
 ```
 
-This plugin implements a builder to make toggling options as easy as possible. You may specify zero to one of `nvim_set_keymap`'s `mode` argument (i.e. you can `map.x` or `map`).
+This plugin implements a builder to make toggling options as easy as possible. You may specify zero to one of `nvim_set_keymap`'s `mode` argument (i.e. you can `map.x` or `map`). It also supports all of the `:h :map-arguments`. `nore` is used to perform a non-recursive `:map`. The ordering of arguments is not important:
 
-A `cartographer` operation can be configured further. It supports all of the `:map-arguments`. `nore` is used to perform a non-recursive `:map`:
+```lua
+assert(vim.deep_equal(map.n.nore.silent.unique, map.silent.n.unique.nore))
+```
+
+Here is an example:
 
 ```lua
 -- `:map` 'gt' in normal mode to searching for symbol references with the LSP
-map.n.nore.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
+map.n.nore.silent.unique['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
 ```
 
 The above is equivalent to the following VimL:
 
 ```vim
 " This is how you bind `gr` to the builtin LSP symbol-references command
-nnoremap <silent> gr <Cmd>lua vim.lsp.buf.references()<CR>
+nnoremap <silent><unique> gr <Cmd>lua vim.lsp.buf.references()<CR>
 ```
+
+### Buffer-Local Mapping
 
 You can create mappings for specific buffers:
 
 ```lua
+local nnoremap = map.n.nore.silent
+
 -- Only buffer sets map to current buffer
-map.n.nore.buffer.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
+nnoremap.buffer['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
 
 -- You can specify bufnr like <bufer=n>
 -- This keymap will be set for buffer 3
-map.n.nore.buffer3.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
-```
-
-Creating multiple mapings with similar options is easy to do:
-
-```lua
-local nnoremap = require 'cartographer'.n.nore.silent
-nnoremap['key1'] = expr1
-nnoremap['key2'] = expr2
-
--- You can add options on top of `nnoremap` too
-nnoremap.buffer['key3'] = expr3
+nnoremap.buffer3['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
 ```
 
 ### Lua Functions
