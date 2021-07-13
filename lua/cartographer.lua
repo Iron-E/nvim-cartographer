@@ -22,7 +22,7 @@ local function copy(tbl)
 	return new_tbl
 end
 
---- The tool for building `:map`s. Used as a metatable.
+--- The fluent interface `:map`s. Used as a metatable.
 local MetaCartographer
 MetaCartographer =
 {
@@ -37,7 +37,7 @@ MetaCartographer =
 			self._modes[#self._modes+1] = key
 		elseif #key > 5 and key:sub(1, 1) == 'b' then -- PERF: 'buffer' is the only 6-letter option starting with 'b'
 			self.buffer = #key > 6 and tonumber(key:sub(7)) or 0 -- NOTE: 0 is the current buffer
-		else -- the builder
+		else -- the fluent interface
 			self[key] = true
 		end
 
@@ -97,7 +97,7 @@ MetaCartographer =
 
 --- A Neovim plugin to create more straightforward syntax for Lua `:map`ping and `:unmap`ping.
 --- @module nvim-cartographer
---- @return table Cartographer a builder for `:map` / `:unmap` interaction
+--- @return table Cartographer a fluent interface for `:map` / `:unmap` interaction
 return setmetatable(new(),
 {
 	-- NOTE: For backwards compatability. `__index` is preferred.
