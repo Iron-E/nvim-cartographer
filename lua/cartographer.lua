@@ -64,6 +64,20 @@ MetaCartographer =
 				unique = rawget(self, 'unique'),
 			}
 
+			-- Handle term codes
+			if opts.expr then
+				local original_rhs = rhs
+				if type(rhs) == 'string' then
+					rhs = function()
+						return vim.api.nvim_replace_termcodes(vim.fn.eval(original_rhs), true, false, true)
+					end
+				elseif type(rhs) == 'function' then
+					rhs = function()
+						return vim.api.nvim_replace_termcodes(original_rhs(), true, false, true)
+					end
+				end
+			end
+
 			if type(rhs) == 'function' then
 				local id = Callbacks.new(rhs)
 				rhs = opts.expr and
