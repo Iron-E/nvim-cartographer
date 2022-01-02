@@ -1,5 +1,4 @@
---- The Neovim API
-local api = vim.api
+--- The current
 
 --- The Cargorapher Lua-callbacks registrant
 local Callbacks = require 'cartographer.callbacks'
@@ -74,21 +73,21 @@ MetaCartographer =
 
 			if buffer then
 				for _, mode in ipairs(modes) do
-					api.nvim_buf_set_keymap(buffer, mode, lhs, rhs, opts)
+					vim.api.nvim_buf_set_keymap(buffer, mode, lhs, rhs, opts)
 				end
 			else
 				for _, mode in ipairs(modes) do
-					api.nvim_set_keymap(mode, lhs, rhs, opts)
+					vim.api.nvim_set_keymap(mode, lhs, rhs, opts)
 				end
 			end
 		else
 			if buffer then
 				for _, mode in ipairs(modes) do
-					api.nvim_buf_del_keymap(buffer, mode, lhs)
+					vim.api.nvim_buf_del_keymap(buffer, mode, lhs)
 				end
 			else
 				for _, mode in ipairs(modes) do
-					api.nvim_del_keymap(mode, lhs)
+					vim.api.nvim_del_keymap(mode, lhs)
 				end
 			end
 		end
