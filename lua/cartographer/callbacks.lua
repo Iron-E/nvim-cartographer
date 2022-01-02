@@ -1,6 +1,5 @@
 --- A Neovim plugin to create more straightforward syntax for Lua `:map`ping and `:unmap`ping.
---- @module callbacks
---- @alias Callbacks table
+--- @class Cartographer.Callbacks
 local Callbacks = {}
 
 --- Register a callback to be
