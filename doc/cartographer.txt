@@ -66,6 +66,22 @@ You can create mappings for specific buffers: >
 <
 
 --------------------------------------------------------------------------------
+HOOKS                                                         *cartographer-hooks*
+
+You can register a function to be called when mapping or unmapping. This
+function has the same parameters as |nvim_buf_set_keymap|. >
+	local map = require 'cartographer'
+	map:hook(function(buffer, modes, lhs, rhs, opts)
+		-- setup which-key, etc
+		print(vim.inspect(lhs)..' was mapped to '..vim.inspect(rhs))
+	end)
+	map['zxpp'] = vim.lsp.buf.definition
+<
+
+The `buffer` parameter will be `nil` when the mapping is not buffer-local.
+See: |cartographer-buffer-local|
+
+--------------------------------------------------------------------------------
 LUA FUNCTIONS                                         *cartographer-lua-functions*
 
 You can also register `local` lua `function`s to mappings, rather than attempt to
