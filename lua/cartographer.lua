@@ -8,7 +8,7 @@ local Callbacks = (version.major == 0 and version.minor < 7) and require 'cartog
 
 --- Return an empty table with all necessary fields initialized.
 --- @return table
-local function new() return {_modes = {}} end
+local function new() return {_modes = {}, _opts = {}} end
 
 --- Make a deep copy of opts table
 --- @param tbl table the table to copy
@@ -16,10 +16,13 @@ local function new() return {_modes = {}} end
 local function copy(tbl)
 	local new_tbl = new()
 
-	for key, val in pairs(tbl) do
-		if key ~= '_modes' then new_tbl[key] = val
-		else for i, mode in ipairs(tbl._modes) do new_tbl._modes[i] = mode end
-		end
+	new_tbl._hook = rawget(tbl, '_hook')
+	for i, val in ipairs(rawget(tbl, '_modes')) do
+		new_tbl._modes[i] = val
+	end
+
+	for key, val in pairs(rawget(tbl, '_opts')) do
+		new_tbl._opts[key] = val
 	end
 
 	return new_tbl
@@ -28,24 +31,37 @@ end
 --- A fluent interface to create more straightforward syntax for Lua |:map|ping and |:unmap|ping.
 --- @class Cartographer
 --- @field buffer number the buffer to apply the keymap to.
+--- @field _hook function|nil something to call after creating the keymap.
 --- @field _modes table the modes to apply a keymap to.
+--- @field _opts table the options to use when creating the keymapping.
 local Cartographer = {}
+
+--- Register some `fn` to be called when creating a new keymapping.
+--- Has the same parameters as |nvim_buf_set_keymap|.
+--- The first parameter passed to `fn` will be `nil` when the mapping is not buffer-local.
+--- @param fn function the function to call when setting a keymapping.
+function Cartographer:hook(fn)
+	rawset(self, '_hook', fn)
+end
 
 --- Set `key` to `true` if it was not already present
 --- @param key string the setting to set to `true`
 --- @returns table self so that this function can be called again
 function Cartographer:__index(key)
-	self = copy(self)
+	self = setmetatable(copy(self), Cartographer)
 
 	if #key < 2 then -- set the mode
-		self._modes[#self._modes+1] = key
+		local modes = rawget(self, '_modes')
+		modes[#modes+1] = key
 	elseif #key > 5 and key:sub(1, 1) == 'b' then -- PERF: 'buffer' is the only 6-letter option starting with 'b'
-		self.buffer = #key > 6 and tonumber(key:sub(7)) or 0 -- NOTE: 0 is the current buffer
+		rawset(self, 'buffer', #key > 6 and tonumber(key:sub(7)) or 0) -- NOTE: 0 is the current buffer
+	elseif key == 'hook' then
+		return getmetatable(self).hook
 	else -- the fluent interface
-		self[key] = true
+		rawget(self, '_opts')[key] = true
 	end
 
-	return setmetatable(self, Cartographer)
+	return self
 end
 
 --- Set a `lhs` combination of keys to some `rhs`
@@ -53,20 +69,16 @@ end
 --- @param rhs string|nil if `nil`, |:unmap| lhs. Otherwise, see |:map|.
 function Cartographer:__newindex(lhs, rhs)
 	local buffer = rawget(self, 'buffer')
+	local hook = rawget(self, '_hook')
+
 	local modes = rawget(self, '_modes')
 	modes = #modes > 0 and modes or {''}
 
-	if rhs then
-		local opts =
-		{
-			expr = rawget(self, 'expr'),
-			noremap = rawget(self, 'nore'),
-			nowait = rawget(self, 'nowait'),
-			script = rawget(self, 'script'),
-			silent = rawget(self, 'silent'),
-			unique = rawget(self, 'unique'),
-		}
+	local opts = rawget(self, '_opts')
+	opts.noremap = opts.nore
+	opts.nore = nil
 
+	if rhs then
 		if type(rhs) == 'function' then
 			if Callbacks then -- TODO: remove when `0.7` is stabilized
 				local id = Callbacks.new(rhs)
@@ -99,6 +111,10 @@ function Cartographer:__newindex(lhs, rhs)
 				vim.api.nvim_del_keymap(mode, lhs)
 			end
 		end
+	end
+
+	if hook then
+		hook(buffer, modes, lhs, rhs, opts)
 	end
 end
 
