@@ -41,28 +41,32 @@ local Cartographer = {}
 --- The first parameter passed to `fn` will be `nil` when the mapping is not buffer-local.
 --- @param fn function the function to call when setting a keymapping.
 function Cartographer:hook(fn)
-	rawset(self, '_hook', fn)
-	return self
+	self = copy(self)
+	self._hook = fn
+	return setmetatable(self, Cartographer)
 end
 
 --- Set `key` to `true` if it was not already present
 --- @param key string the setting to set to `true`
 --- @returns table self so that this function can be called again
 function Cartographer:__index(key)
-	self = setmetatable(copy(self), Cartographer)
+	if key ~= 'hook' then
+		self = copy(self)
 
-	if #key < 2 then -- set the mode
-		local modes = rawget(self, '_modes')
-		modes[#modes+1] = key
-	elseif #key > 5 and key:sub(1, 1) == 'b' then -- PERF: 'buffer' is the only 6-letter option starting with 'b'
-		rawset(self, 'buffer', #key > 6 and tonumber(key:sub(7)) or 0) -- NOTE: 0 is the current buffer
-	elseif key == 'hook' then
-		return getmetatable(self).hook
-	else -- the fluent interface
-		rawget(self, '_opts')[key] = true
+		if #key < 2 then -- set the mode
+			self._modes[#self._modes+1] = key
+		elseif #key > 5 and key:sub(1, 1) == 'b' then -- PERF: 'buffer' is the only 6-letter option starting with 'b'
+			self = copy(self)
+			self.buffer = #key > 6 and tonumber(key:sub(7)) or 0 -- NOTE: 0 is the current buffer
+		else -- the fluent interface
+			self = copy(self)
+			self._opts[key] = true
+		end
+
+		return setmetatable(self, Cartographer)
 	end
 
-	return self
+	return Cartographer.hook
 end
 
 --- Set a `lhs` combination of keys to some `rhs`
