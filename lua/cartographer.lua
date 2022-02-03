@@ -42,6 +42,7 @@ local Cartographer = {}
 --- @param fn function the function to call when setting a keymapping.
 function Cartographer:hook(fn)
 	rawset(self, '_hook', fn)
+	return self
 end
 
 --- Set `key` to `true` if it was not already present
