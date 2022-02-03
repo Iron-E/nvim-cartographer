@@ -118,9 +118,9 @@ function Cartographer:__newindex(lhs, rhs)
 		end
 	end
 
-	if hook then
-		hook(buffer, modes, lhs, rhs, opts)
-	end
+	if hook then for _, mode in ipairs(modes) do
+		hook(buffer, mode, lhs, rhs, opts)
+	end end
 end
 
 return setmetatable(new(), Cartographer)
