@@ -71,7 +71,7 @@ HOOKS                                                         *cartographer-hook
 You can register a function to be called when mapping or unmapping. This
 function has the same parameters as |nvim_buf_set_keymap|. >
 	local map = require 'cartographer'
-	map:hook(function(buffer, modes, lhs, rhs, opts)
+	map:hook(function(buffer, mode, lhs, rhs, opts)
 		-- setup which-key, etc
 		print(vim.inspect(lhs)..' was mapped to '..vim.inspect(rhs))
 	end)

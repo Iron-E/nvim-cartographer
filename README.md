@@ -82,7 +82,7 @@ You can register a function to be called when mapping or unmapping. This functio
 
 ```lua
 local map = require 'cartographer'
-map:hook(function(buffer, modes, lhs, rhs, opts)
+map:hook(function(buffer, mode, lhs, rhs, opts)
 	-- setup which-key, etc
 	print(vim.inspect(lhs)..' was mapped to '..vim.inspect(rhs))
 end)
@@ -116,7 +116,7 @@ map.n.nore.silent['<Tab>'] = float_term
 
 ### Multiple Modes
 
-You can `:map` to multiple `modes` if necessary.
+You can `:map` to multiple `mode`s if necessary.
 
 ```lua
 -- Map `gr` to LSP symbol references in 'x' and 'n' modes.
