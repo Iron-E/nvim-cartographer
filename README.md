@@ -66,7 +66,7 @@ nnoremap <silent><unique> gr <Cmd>lua vim.lsp.buf.references()<CR>
 You can create mappings for specific buffers:
 
 ```lua
-local nnoremap = map.n.nore.silent
+local nnoremap = require('cartographer').n.nore.silent
 
 -- Only buffer sets map to current buffer
 nnoremap.buffer['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
@@ -76,25 +76,39 @@ nnoremap.buffer['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
 nnoremap.buffer3['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
 ```
 
+### Hooks
+
+You can register a function to be called when mapping or unmapping. This function has the same parameters as `nvim_buf_set_keymap`.
+
+```lua
+local map = require 'cartographer'
+map:hook(function(buffer, mode, lhs, rhs, opts)
+	-- setup which-key, etc
+	print(vim.inspect(lhs)..' was mapped to '..vim.inspect(rhs))
+end)
+map['zxpp'] = vim.lsp.buf.definition
+```
+
+The `buffer` parameter will be `nil` when the mapping is not [buffer-local](#buffer-local-mapping).
+
 ### Lua Functions
 
 You can also register `local` lua `function`s to mappings, rather than attempt to navigate `v:lua`/`luaeval` bindings:
 
 ```lua
-local api = vim.api
-local go = vim.go
+local map = require 'cartographer'
 
 local function float_term()
-	local buffer = api.nvim_create_buf(false, true)
-	local window = api.nvim_open_win(buffer, true,
+	local buffer = vim.api.nvim_create_buf(false, true)
+	local window = vim.api.nvim_open_win(buffer, true,
 	{
 		relative = 'cursor',
-		height = math.floor(go.lines / 2),
-		width = math.floor(go.columns / 2),
+		height = math.floor(vim.go.lines / 2),
+		width = math.floor(vim.go.columns / 2),
 		col = 0,
 		row = 0,
 	})
-	api.nvim_command 'terminal'
+	vim.api.nvim_command 'terminal'
 end
 
 map.n.nore.silent['<Tab>'] = float_term
@@ -102,7 +116,7 @@ map.n.nore.silent['<Tab>'] = float_term
 
 ### Multiple Modes
 
-You can `:map` to multiple `modes` if necessary.
+You can `:map` to multiple `mode`s if necessary.
 
 ```lua
 -- Map `gr` to LSP symbol references in 'x' and 'n' modes.
