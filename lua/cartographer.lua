@@ -1,11 +1,3 @@
---- The current
-local version = vim.version()
-
---- The Cargorapher Lua-callbacks registrant
---- TODO: delete this module when `0.7` is stabilized
---- @type Cartographer.Callbacks|nil
-local Callbacks = (version.major == 0 and version.minor < 7) and require 'cartographer.callbacks'
-
 --- Return an empty table with all necessary fields initialized.
 --- @return table
 local function new() return {_modes = {}, _opts = {}} end
@@ -85,16 +77,9 @@ function Cartographer:__newindex(lhs, rhs)
 
 	if rhs then
 		if type(rhs) == 'function' then
-			if Callbacks then -- TODO: remove when `0.7` is stabilized
-				local id = Callbacks.new(rhs)
-				rhs = opts.expr and
-					'luaeval("require(\'cartographer.callbacks\')['..id..']")()' or
-					'<Cmd>lua require("cartographer.callbacks")['..id..']()<CR>'
-			else
-				opts.callback = rhs
-				rhs = ''
-			end
+			opts.callback = rhs
 			opts.noremap = true
+			rhs = ''
 		end
 
 		if buffer then

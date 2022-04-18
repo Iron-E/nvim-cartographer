@@ -14,7 +14,7 @@ map.n.nore.silent['gr'] = '<Cmd>lua vim.lsp.buf.references()<CR>'
 
 ## Installation
 
-This plugin can be installed with any plugin manager. I use [packer.nvim](https://github.com/wbthomason/packer.nvim):
+This plugin can be installed with any plugin manager and used with Neovim 0.7+. I use [packer.nvim](https://github.com/wbthomason/packer.nvim):
 
 ```lua
 local fn = vim.fn
