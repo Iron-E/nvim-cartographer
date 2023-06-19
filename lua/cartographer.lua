@@ -8,6 +8,7 @@ local function new() return {_modes = {}, _opts = {}} end
 local function copy(tbl)
 	local new_tbl = new()
 
+	new_tbl.buffer = rawget(tbl, 'buffer')
 	new_tbl._hook = rawget(tbl, '_hook')
 	for i, val in ipairs(rawget(tbl, '_modes')) do
 		new_tbl._modes[i] = val
